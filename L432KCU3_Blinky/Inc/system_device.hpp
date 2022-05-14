@@ -26,7 +26,7 @@ public:
     void delay_ms(uint32_t ms);
 
     gpio::Driver m_blinky_led{
-        GPIOB, 
+        gpio::Port::B, 
         gpio::Pin::PIN3, 
         gpio::Mode::OUTPUT, 
         gpio::Otype::PUSHPULL, 

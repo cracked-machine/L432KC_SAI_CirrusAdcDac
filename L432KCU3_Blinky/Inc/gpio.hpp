@@ -9,6 +9,13 @@
 
 namespace stm32::gpio {
 
+enum class Port
+{
+    A,
+    B,
+    C,
+    H
+};
 
 enum class Pin
 {
@@ -60,7 +67,6 @@ enum class Pupd
 };
 
 /// @brief GPIO Driver. Register settings must be passed to c'tor, but mutators can be called afterwards to modify their value
-
 class Driver
 {
 public:
@@ -71,7 +77,7 @@ public:
     /// @param otype The gpio type (pushpull/opendrain)
     /// @param speed The gpio speed (low/medium/high/very high)
     /// @param pupd The gpio pullup/pulldown setting
-    Driver( GPIO_TypeDef* gpio_port, 
+    Driver( Port gpio_port, 
             Pin gpio_pin,
             Mode mode,
             Otype otype,
@@ -111,7 +117,9 @@ private:
     /// @brief Convenience member; 0x1UL bitwise-shifted right by pin number
     uint16_t _pin_shifted = 0x1UL << static_cast<uint16_t>(m_gpio_pin);
 
-    void enable_portb_clock();
+    /// @brief Enable the port and its clock
+    /// @param gpio_port The port object to enable
+    void enable_port(Port gpio_port);
 };
 
 } // namespace stm32

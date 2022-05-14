@@ -5,27 +5,49 @@ namespace stm32::gpio {
 
 
 Driver::Driver(
-    GPIO_TypeDef* gpio_port, 
+    Port gpio_port, 
     Pin gpio_pin,
     Mode mode,
     Otype otype,
     Speed speed,
     Pupd pupd)
-    :   m_gpio_port(gpio_port),
-        m_gpio_pin(gpio_pin)
+    :   m_gpio_pin(gpio_pin)
 {
-    enable_portb_clock();
+
+    enable_portb(gpio_port);
     set_mode(mode);
     set_otype(otype);
     set_speed(speed);
     set_pupd(pupd);
 }
 
-void Driver::enable_portb_clock()
+void Driver::enable_port(Port gpio_port)
 {
-        [[maybe_unused]]  __IO uint32_t tmpreg; 
-        SET_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOBEN); 
-        tmpreg = READ_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOBEN); 
+    [[maybe_unused]]  __IO uint32_t tmpreg; 
+    switch(gpio_port)
+    {
+        case Port::A:
+            m_gpio_port = GPIOA;
+            SET_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOAEN); 
+            tmpreg = READ_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOAEN);         
+            break;
+        case Port::B:
+            m_gpio_port = GPIOB;
+            SET_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOBEN); 
+            tmpreg = READ_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOBEN);         
+            break;
+        case Port::C:
+            m_gpio_port = GPIOC;
+            SET_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOCEN); 
+            tmpreg = READ_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOCEN);         
+            break;
+        case Port::H:
+            m_gpio_port = GPIOH;
+            SET_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOHEN); 
+            tmpreg = READ_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOHEN);         
+            break;
+    }
+
 }
 
 
