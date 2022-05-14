@@ -1,6 +1,7 @@
 target_sources(${BUILD_NAME} PRIVATE
     Src/main.cpp
     Src/system_device.cpp
+    Src/gpio.cpp
     Src/low_level_handlers.c
     Src/syscalls.c
     Src/sysmem.c

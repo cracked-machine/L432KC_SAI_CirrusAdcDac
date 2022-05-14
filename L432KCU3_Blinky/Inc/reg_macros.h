@@ -15,7 +15,7 @@
 
 #define MODIFY_REG(REG, CLEARMASK, SETMASK)  WRITE_REG((REG), (((READ_REG(REG)) & (~(CLEARMASK))) | (SETMASK)))
 
-#define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
+
 
 // void LL_mDelay(uint32_t Delay)
 // {

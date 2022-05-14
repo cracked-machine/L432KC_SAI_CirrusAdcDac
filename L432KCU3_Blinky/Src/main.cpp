@@ -2,7 +2,7 @@
 
 int main(void)
 {
-    SystemDevice the_system;
+    stm32::SystemDevice the_system;
     the_system.run();
     return 0;
 }
