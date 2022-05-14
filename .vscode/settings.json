@@ -1,0 +1,5 @@
+{
+    // "cmake.sourceDirectory": "${workspaceFolder}/L423KC_CirrusCS5343ADC"
+    // "cmake.sourceDirectory": "${workspaceFolder}/L432KC_CirrusCS4344DAC"
+    "cmake.sourceDirectory": "${workspaceFolder}/."
+}
