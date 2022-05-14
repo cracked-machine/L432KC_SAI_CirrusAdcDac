@@ -11,6 +11,7 @@ SystemDevice::SystemDevice()
     // Configure the SysTick to have interrupt in 1ms time basis
     uint32_t tick_freq_1khz = 1U;
     SysTick_Config(SystemCoreClock / (1000U / tick_freq_1khz));
+    fpu_type = SCB_GetFPUType();
    
 }
 

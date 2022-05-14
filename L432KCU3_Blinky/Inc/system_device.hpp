@@ -32,6 +32,8 @@ public:
         gpio::Otype::PUSHPULL, 
         gpio::Speed::VHIGH,
         gpio::Pupd::PU};
+
+    volatile uint32_t fpu_type;        
 };
 
 } // namespace stm32

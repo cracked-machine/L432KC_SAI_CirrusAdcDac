@@ -60,6 +60,7 @@ enum class Pupd
 };
 
 /// @brief GPIO Driver. Register settings must be passed to c'tor, but mutators can be called afterwards to modify their value
+
 class Driver
 {
 public:
@@ -109,6 +110,8 @@ private:
     Pin m_gpio_pin;
     /// @brief Convenience member; 0x1UL bitwise-shifted right by pin number
     uint16_t _pin_shifted = 0x1UL << static_cast<uint16_t>(m_gpio_pin);
+
+    void enable_portb_clock();
 };
 
 } // namespace stm32

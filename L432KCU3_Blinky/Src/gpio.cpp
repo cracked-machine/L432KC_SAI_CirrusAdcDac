@@ -3,6 +3,7 @@
 
 namespace stm32::gpio {
 
+
 Driver::Driver(
     GPIO_TypeDef* gpio_port, 
     Pin gpio_pin,
@@ -13,22 +14,20 @@ Driver::Driver(
     :   m_gpio_port(gpio_port),
         m_gpio_pin(gpio_pin)
 {
-
-    // Enable GPIO Clocks
-    do { 
-        [[maybe_unused]]  __IO uint32_t tmpreg; 
-        SET_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOBEN); 
-
-        /* Delay after an RCC peripheral clock enabling */ 
-        tmpreg = READ_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOBEN); 
-        
-    } while(0);
-
+    enable_portb_clock();
     set_mode(mode);
     set_otype(otype);
     set_speed(speed);
     set_pupd(pupd);
 }
+
+void Driver::enable_portb_clock()
+{
+        [[maybe_unused]]  __IO uint32_t tmpreg; 
+        SET_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOBEN); 
+        tmpreg = READ_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOBEN); 
+}
+
 
 void Driver::set_mode(Mode mode)
 {
