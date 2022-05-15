@@ -111,7 +111,7 @@ public:
 
 private:
     /// @brief The GPIO register object (port)
-    GPIO_TypeDef* m_gpio_port;
+    GPIO_TypeDef* m_gpio_registers;
     /// @brief The GPIO pin object
     Pin m_gpio_pin;
     /// @brief Convenience member; 0x1UL bitwise-shifted right by pin number

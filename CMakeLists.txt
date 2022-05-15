@@ -41,8 +41,9 @@ message("*** Selected ${PROJECT_DIR} project ***")
 add_executable(${BUILD_NAME} "")
 
 # add common sources
-add_subdirectory(${CMAKE_SOURCE_DIR}/${PROJECT_DIR})
-
+add_subdirectory(${CMAKE_SOURCE_DIR}/${PROJECT_DIR}/Application)
+add_subdirectory(${CMAKE_SOURCE_DIR}/${PROJECT_DIR}/Library)
+add_subdirectory(${CMAKE_SOURCE_DIR}/${PROJECT_DIR}/LowLevel)
 
 # add the stm32-specific sources for the embedded build
 if(TARGET_TYPE STREQUAL ARM)
