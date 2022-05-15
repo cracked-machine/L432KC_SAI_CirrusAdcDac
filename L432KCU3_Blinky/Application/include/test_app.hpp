@@ -7,7 +7,7 @@
 class TestApp
 {
 public:
-    TestApp() = default;
+    TestApp();
     void run();
 private:
 
@@ -26,8 +26,10 @@ private:
     stm32::timer::BasicTimer m_blinky_timer
     {
         stm32::timer::Block::T6,
-        64,
-        1024
+        64,     // psc
+        1024,   // arr
+        0,      // cnt
+        true    // delayed start
     };
 
 };

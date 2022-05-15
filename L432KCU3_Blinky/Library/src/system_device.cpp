@@ -13,6 +13,10 @@ SystemDevice::SystemDevice()
 
     [[maybe_unused]]  __IO uint32_t tmpreg; 
 
+    // Enable the SYSCFG + COMP + VREFBUF clock
+    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+    tmpreg = RCC->APB2ENR & RCC_APB2ENR_SYSCFGEN;
+
     // Enable the PWR clock
     RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN;
     tmpreg = RCC->APB1ENR1 & RCC_APB1ENR1_PWREN;

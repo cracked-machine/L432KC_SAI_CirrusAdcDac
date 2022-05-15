@@ -38,7 +38,7 @@ public:
     /// @param timer_id The timer peripheral to enable
     /// @param delayed_start if true enable timer now, if false leave disabled. True by default
     /// @note Implicit defaults are: opm = false, urs_cnt_only = false, arpe = true,
-    BasicTimer(Block timer_id, uint16_t psc, uint16_t arr, uint16_t cnt = 0, bool delayed_start = false);
+    BasicTimer(Block timer_block, uint16_t psc, uint16_t arr, uint16_t cnt = 0, bool delayed_start = false);
 
     void enable(bool enable_timer);
 
@@ -66,7 +66,8 @@ public:
 
     /// @brief Set the interrupts object
     /// @param dier TIM_DIER_UDE, TIM_DIER_UIE
-    void set_interrupts(DierBits dier);
+    /// @param prio IRQ priority (numerically lower is higher priority)
+    void set_interrupts(DierBits dier, uint32_t prio);
 
     /// @brief Check the "Status Register" bit. 
     /// @param sr TIM_SR_UIF
@@ -76,8 +77,11 @@ public:
 
 private:
     TIM_TypeDef* m_timer_registers;
-
+    Block m_timer_block;
 };
+
+extern "C" void TIM6_DACUNDER_IRQHandler(void);
+extern "C" void TIM7_IRQHandler(void);
 
 
 } // namespace stm32::timer
