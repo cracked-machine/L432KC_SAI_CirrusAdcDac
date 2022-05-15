@@ -25,6 +25,15 @@ BasicTimer::BasicTimer(Block timer_block, uint16_t psc, uint16_t arr, uint16_t c
             break;
     }
 
+    init_cr1(psc, arr, cnt, delayed_start);
+}
+
+BasicTimer::BasicTimer(Block timer_block)
+: m_timer_block(timer_block)
+{}
+
+void BasicTimer::init_cr1(uint16_t psc, uint16_t arr, uint16_t cnt, bool delayed_start)
+{
     // set the CR1 with defaults
     set_opm();
     set_urs();
@@ -39,7 +48,7 @@ BasicTimer::BasicTimer(Block timer_block, uint16_t psc, uint16_t arr, uint16_t c
     m_timer_registers->EGR = TIM_EGR_UG;  
 
     // Enable the timer
-    if (!delayed_start) { enable(true); }
+    if (!delayed_start) { enable(true); }    
 }
 
 void BasicTimer::enable(bool enable_timer)
@@ -87,7 +96,7 @@ void BasicTimer::set_cnt(uint16_t cnt)
     m_timer_registers->CNT = cnt;
 }
 
-void BasicTimer::set_interrupts(DierBits dier, uint32_t prio)
+void BasicTimer::set_interrupts(BasicTimer::DierBits dier, uint32_t prio)
 {
     // Setup the NVIC, priority and DIER register
     switch(m_timer_block)
@@ -118,17 +127,22 @@ bool BasicTimer::is_status_set(StatusBits sr, bool auto_clear)
     }
 }
 
+void BasicTimer::register_handler_base(BasicTimer::ISRVectors vector, BasicTimer* handler)
+{
+    m_basic_timer_irq_mappings[static_cast<std::size_t>(vector)] = handler;
+}
+
 extern "C" void TIM6_DACUNDER_IRQHandler(void)
 {
     using namespace stm32::timer;
-    BasicTimer::m_isr_callbacks[static_cast<std::size_t>(BasicTimer::ISRVectors::TIM6_DACUNDER_IRQHandler)]->ISR();
+    BasicTimer::m_basic_timer_irq_mappings[static_cast<std::size_t>(BasicTimer::ISRVectors::TIM6_DACUNDER_IRQHandler)]->ISR();
     TIM6->SR &= ~TIM_SR_UIF;
 }
 
 extern "C" void TIM7_IRQHandler(void)
 {
     using namespace stm32::timer;
-    BasicTimer::m_isr_callbacks[static_cast<std::size_t>(BasicTimer::ISRVectors::TIM7_IRQHandler)]->ISR();
+    BasicTimer::m_basic_timer_irq_mappings[static_cast<std::size_t>(BasicTimer::ISRVectors::TIM7_IRQHandler)]->ISR();
     TIM7->SR &= ~TIM_SR_UIF;
 }
 

@@ -25,4 +25,7 @@ void DebugMon_Handler(void) { }
 // Pendable request for system service
 void PendSV_Handler(void) { }
 
+// Pure virtual function call error handler. 
+// Prevents linker bloating code if using pure virtual functions.
+void __cxa_pure_virtual(void) { while(1); }
 

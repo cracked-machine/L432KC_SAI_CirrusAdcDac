@@ -10,7 +10,10 @@
 
 
 #include <gpio.hpp>
-#include <basic_timer.hpp>
+
+#include <general_timer_16bit.hpp>
+#include <general_timer_32bit.hpp>
+#include <advanced_timer.hpp>
 
 namespace stm32 {
 
