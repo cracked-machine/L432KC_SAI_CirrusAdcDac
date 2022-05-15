@@ -18,22 +18,11 @@ class SystemDevice
 public:
     /// @brief Initialize the system device clocks
     SystemDevice();
-
-    void run();
     
     /// @brief delay the system clock
     /// @param ms The time to delay in milliseconds
     void delay_ms(uint32_t ms);
 
-    gpio::Driver m_blinky_led{
-        gpio::Port::B, 
-        gpio::Pin::PIN3, 
-        gpio::Mode::OUTPUT, 
-        gpio::Otype::PUSHPULL, 
-        gpio::Speed::VHIGH,
-        gpio::Pupd::PU};
-
-    volatile uint32_t fpu_type;        
 };
 
 } // namespace stm32

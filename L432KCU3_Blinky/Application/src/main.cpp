@@ -1,9 +1,8 @@
-#include <system_device.hpp>
+#include <test_app.hpp>
 
-int main(void)
+void main(void)
 {
-    stm32::SystemDevice the_system;
-    the_system.run();
-    return 0;
+    TestApp the_app;
+    the_app.run();
 }
 

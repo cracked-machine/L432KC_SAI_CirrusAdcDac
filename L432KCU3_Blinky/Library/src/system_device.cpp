@@ -66,19 +66,6 @@ SystemDevice::SystemDevice()
    
 }
 
-void SystemDevice::run()
-{
-
-    /* Loop forever */
-	while(1)
-    {
-
-        // delay_ms(100);
-        m_blinky_led.toggle();
-
-    }    
-}
-
 void SystemDevice::delay_ms(uint32_t ms) {
     uint32_t start = g_systick;
     while (g_systick - start < ms);
