@@ -120,11 +120,15 @@ bool BasicTimer::is_status_set(StatusBits sr, bool auto_clear)
 
 extern "C" void TIM6_DACUNDER_IRQHandler(void)
 {
+    using namespace stm32::timer;
+    BasicTimer::m_isr_callbacks[static_cast<std::size_t>(BasicTimer::ISRVectors::TIM6_DACUNDER_IRQHandler)]->ISR();
     TIM6->SR &= ~TIM_SR_UIF;
 }
 
 extern "C" void TIM7_IRQHandler(void)
 {
+    using namespace stm32::timer;
+    BasicTimer::m_isr_callbacks[static_cast<std::size_t>(BasicTimer::ISRVectors::TIM7_IRQHandler)]->ISR();
     TIM7->SR &= ~TIM_SR_UIF;
 }
 

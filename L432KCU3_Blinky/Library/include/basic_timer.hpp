@@ -5,7 +5,7 @@
     #undef USE_HAL_DRIVER
 #endif
 #include <stm32l4xx.h>
-
+#include <array>
 namespace stm32::timer
 {
 
@@ -39,7 +39,7 @@ public:
     /// @param delayed_start if true enable timer now, if false leave disabled. True by default
     /// @note Implicit defaults are: opm = false, urs_cnt_only = false, arpe = true,
     BasicTimer(Block timer_block, uint16_t psc, uint16_t arr, uint16_t cnt = 0, bool delayed_start = false);
-
+    
     void enable(bool enable_timer);
 
     /// @brief Set the "one pulse mode"
@@ -74,6 +74,28 @@ public:
     /// @param auto_clear if true the bit is cleared on read. True by default.
     /// @return true if bit is set, false it not
     bool is_status_set(StatusBits sr, bool auto_clear = true);
+
+
+    enum class ISRVectors
+    {
+        TIM6_DACUNDER_IRQHandler,
+        TIM7_IRQHandler,
+        LENGTH
+    };
+
+    static inline std::array<BasicTimer*, static_cast<std::size_t>(ISRVectors::LENGTH)> m_isr_callbacks;
+    virtual void ISR() 
+    {
+        while(true) 
+        {
+            // not implemented
+        }
+    };
+
+    void register_handler_base(ISRVectors vector, BasicTimer* handler)
+    {
+        m_isr_callbacks[static_cast<std::size_t>(vector)] = handler;
+    }
 
 private:
     TIM_TypeDef* m_timer_registers;

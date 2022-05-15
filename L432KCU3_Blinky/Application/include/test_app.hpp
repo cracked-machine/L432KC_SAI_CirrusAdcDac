@@ -7,8 +7,12 @@
 class TestApp
 {
 public:
+    /// @brief Construct a new Test App object
     TestApp();
+    /// @brief Main loop
     void run();
+    /// @brief Redirected callback from static TIM IRQ
+    void blinky_timer_callback();
 private:
 
     stm32::SystemDevice m_system;
@@ -23,14 +27,36 @@ private:
         stm32::gpio::Pupd::PU
     };    
 
-    stm32::timer::BasicTimer m_blinky_timer
+    /// @brief led blink timer
+    class BlinkyTimer : public stm32::timer::BasicTimer
     {
-        stm32::timer::Block::T6,
-        64,     // psc
-        1024,   // arr
-        0,      // cnt
-        true    // delayed start
+    public:
+        /// @brief Construct a new BlinkyTimer object
+        /// @param handler Pointer to the parent class
+        BlinkyTimer(TestApp* handler) 
+        : stm32::timer::BasicTimer(
+            stm32::timer::Block::T6,
+            1,      // psc
+            1,      // arr
+            0,      // cnt
+            true)    // delayed start
+        
+        {
+            // register the parent class pointer with ISR() callback
+            m_handler = handler;
+            stm32::timer::BasicTimer::register_handler_base(
+                stm32::timer::BasicTimer::ISRVectors::TIM6_DACUNDER_IRQHandler, 
+                this);
+        }
+    private:
+        /// @brief Pointer to the parent class
+        TestApp* m_handler = nullptr;
+        /// @brief Redirect the ISR() callback to parent class non-static member function 
+        void ISR() { m_handler->blinky_timer_callback(); }
     };
+
+    /// @brief led blink timer object 
+    BlinkyTimer m_blinky_timer{this};
 
 };
 
