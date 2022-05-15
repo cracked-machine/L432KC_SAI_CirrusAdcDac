@@ -25,6 +25,7 @@ endif()
 
 # load the appropriate toolchain settings (stm32.cmake or linux.cmake)
 if(TARGET_TYPE STREQUAL ARM)
+    add_compile_definitions(${TARGET} STM32L432xx)
     include(${CMAKE_SOURCE_DIR}/${PROJECT_DIR}/cmake/stm32.cmake)
 elseif(TARGET_TYPE STREQUAL GNU)
     include(${CMAKE_SOURCE_DIR}/${PROJECT_DIR}/cmake/linux.cmake)    
@@ -58,6 +59,8 @@ if(TARGET_TYPE STREQUAL ARM)
     #     "${PROJECT_SOURCE_DIR}/stm32cube_workspace")
 
 endif()
+
+remove_definitions(USE_HAL_DRIVER)
 
 # display size info
 add_custom_target(size ALL ${CMAKE_SIZE} ${BUILD_NAME} DEPENDS ${BUILD_NAME})

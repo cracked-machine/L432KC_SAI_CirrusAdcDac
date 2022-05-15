@@ -43,8 +43,7 @@ enable_language(CXX)
 set(CMAKE_ASM_FLAGS "${COMMON_FLAGS} -MP -MD -x assembler-with-cpp" CACHE INTERNAL "asm compiler flags")
 enable_language(ASM)
 
-# Required to include STM32 LL framework
-add_compile_definitions(${TARGET} USE_HAL_DRIVER)
+
 
 # # used to include stm32g0xx.h dependency (and maybe stm32g0xx LL)
 # add_compile_definitions(

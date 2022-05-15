@@ -1,5 +1,9 @@
 {
     // "cmake.sourceDirectory": "${workspaceFolder}/L423KC_CirrusCS5343ADC"
     // "cmake.sourceDirectory": "${workspaceFolder}/L432KC_CirrusCS4344DAC"
-    "cmake.sourceDirectory": "${workspaceFolder}/."
+    "cmake.sourceDirectory": "${workspaceFolder}/.",
+    "files.associations": {
+        "reg_macros.h": "c",
+        "stm32l4xx.h": "c"
+    }
 }
