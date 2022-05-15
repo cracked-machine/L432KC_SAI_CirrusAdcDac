@@ -63,7 +63,6 @@ SystemDevice::SystemDevice()
 
     SystemCoreClockUpdate();
     SysTick_Config(SystemCoreClock / (1000U));
-    fpu_type = SCB_GetFPUType();
    
 }
 

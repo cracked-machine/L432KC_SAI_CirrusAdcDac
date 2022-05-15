@@ -23,6 +23,9 @@ Driver::Driver(
 
 void Driver::enable_port(Port gpio_port)
 {
+    // Each case will: 
+    // 1) assign the requested GPIO_TypeDef instance to the m_gpio_port member 
+    // 2) Enable the requested AHB2 bus clock for that GPIO port. Read back enforces a required short delay.
     [[maybe_unused]]  __IO uint32_t tmpreg; 
     switch(gpio_port)
     {
