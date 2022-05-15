@@ -14,7 +14,7 @@ Driver::Driver(
     :   m_gpio_pin(gpio_pin)
 {
 
-    enable_portb(gpio_port);
+    enable_port(gpio_port);
     set_mode(mode);
     set_otype(otype);
     set_speed(speed);
@@ -77,7 +77,6 @@ void Driver::set_pupd(Pupd pupd)
 
 void Driver::toggle()
 {
-
     WRITE_REG(m_gpio_port->BSRR, ((m_gpio_port->ODR & _pin_shifted) << 16u) | (~m_gpio_port->ODR & _pin_shifted));     
 }
 
