@@ -13,7 +13,8 @@ private:
 
     stm32::SystemDevice m_system;
 
-    stm32::gpio::Driver m_blinky_led{
+    stm32::gpio::Driver m_blinky_led
+    {
         stm32::gpio::Port::B, 
         stm32::gpio::Pin::PIN3, 
         stm32::gpio::Mode::OUTPUT, 
@@ -21,6 +22,13 @@ private:
         stm32::gpio::Speed::VHIGH,
         stm32::gpio::Pupd::PU
     };    
+
+    stm32::timer::BasicTimer m_blinky_timer
+    {
+        stm32::timer::Block::T6,
+        64,
+        1024
+    };
 
 };
 
