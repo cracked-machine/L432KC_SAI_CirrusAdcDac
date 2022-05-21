@@ -3,22 +3,21 @@
 namespace stm32::timer
 {
 
-BasicTimer::BasicTimer(Block timer_block, uint16_t psc, uint16_t arr, uint16_t cnt, bool delayed_start)
-: m_timer_block(timer_block)
+BasicTimer::BasicTimer(ISRVectors irq, uint16_t psc, uint16_t arr, uint16_t cnt, bool delayed_start)
 {
     // Each case will: 
     // 1) assign the requested TIM_TypeDef instance to the m_timer_registers member 
     // 2) Enable the requested APB1 bus clock for that timer block. Read back enforces a required short delay.
     [[maybe_unused]]  __IO uint32_t tmpreg;     
-    switch(m_timer_block)
+    switch(irq)
     {
-        case Block::T6:
+        case ISRVectors::TIM6_DACUNDER_IRQHandler:
             m_timer_registers = TIM6;
             SET_BIT(RCC->APB1ENR1, RCC_APB1ENR1_TIM6EN); 
             tmpreg = READ_BIT(RCC->APB1ENR1, RCC_APB1ENR1_TIM6EN);        
             break;
         
-        case Block::T7:
+        case ISRVectors::TIM7_IRQHandler:
             m_timer_registers = TIM7;
             SET_BIT(RCC->APB1ENR1, RCC_APB1ENR1_TIM7EN); 
             tmpreg = READ_BIT(RCC->APB1ENR1, RCC_APB1ENR1_TIM7EN);  

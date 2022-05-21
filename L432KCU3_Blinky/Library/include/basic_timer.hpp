@@ -41,11 +41,14 @@ public:
         LENGTH
     };    
 
-    /// @brief Construct a new Basic Timer object
-    /// @param timer_id The timer peripheral to enable
+    /// @brief Construct a new Basic Timer object. 
+    /// Implicit defaults are: one pulse mode disabled, all UEV source enabled, auto-reload preload enabled
+    /// @param irq The timer/IRQ to use
+    /// @param psc The prescaler value
+    /// @param arr The auto-reload value
+    /// @param cnt The initial counter value
     /// @param delayed_start if true enable timer now, if false leave disabled. True by default
-    /// @note Implicit defaults are: opm = false, urs_cnt_only = false, arpe = true,
-    BasicTimer(Block timer_block, uint16_t psc, uint16_t arr, uint16_t cnt = 0, bool delayed_start = false);
+    BasicTimer(ISRVectors irq, uint16_t psc, uint16_t arr, uint16_t cnt, bool delayed_start);
     
     void enable(bool enable_timer);
 
