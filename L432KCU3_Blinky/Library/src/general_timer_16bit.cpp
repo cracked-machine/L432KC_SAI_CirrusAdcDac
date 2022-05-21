@@ -33,22 +33,49 @@ GeneralTimer16Bit::GeneralTimer16Bit(Block timer_block)
 : BasicTimer(static_cast<BasicTimer::Block>(timer_block))
 {}
 
-void GeneralTimer16Bit::set_interrupts(GeneralTimer16Bit::DierBits dier, uint32_t prio)
+bool GeneralTimer16Bit::set_interrupts( GeneralTimer16Bit::DierBits dier,
+                                        GeneralTimer16Bit::ISRVectors vector, 
+                                        GeneralTimer16Bit* handler, 
+                                        uint32_t prio)
 {
-    // Setup the NVIC, priority and DIER register
-    switch(static_cast<GeneralTimer16Bit::Block> (m_timer_block))
+    switch(dier)
     {
-        case Block::T15:
-            NVIC_SetPriority(TIM1_BRK_TIM15_IRQn, prio);
-            NVIC_EnableIRQ(TIM1_BRK_TIM15_IRQn);             
-            break;
+        case DierBits::UDE:
+            // should not set DMA using this function
+            return false;
+
+        case DierBits::CC1DE:
+        case DierBits::CC1IE:
+        case DierBits::COMDE:
+        case DierBits::COMIE:
+        case DierBits::BIE:
+            // not implemented 
+            return false;
+
+        case DierBits::UIE:
+            // Set the caller as the target for callback to ISR() function
+            register_handler_base(vector, handler);
         
-        case Block::T16:
-            NVIC_SetPriority(TIM1_UP_TIM16_IRQn, prio);
-            NVIC_EnableIRQ(TIM1_UP_TIM16_IRQn);             
-            break;
-    }    
-    m_timer_registers->DIER = static_cast<uint16_t>(dier);
+            // Setup the NVIC, priority and DIER register
+            switch(vector)
+            {
+                case ISRVectors::TIM1_BRK_TIM15_IRQHandler:
+                    NVIC_SetPriority(TIM1_BRK_TIM15_IRQn, prio);
+                    NVIC_EnableIRQ(TIM1_BRK_TIM15_IRQn);             
+                    break;
+                
+                case ISRVectors::TIM1_UP_TIM16_IRQHandler:
+                    NVIC_SetPriority(TIM1_UP_TIM16_IRQn, prio);
+                    NVIC_EnableIRQ(TIM1_UP_TIM16_IRQn);             
+                    break;
+            }    
+            m_timer_registers->DIER = static_cast<uint16_t>(dier);            
+            return true;
+
+        default: 
+            return false;
+    }
+
 }
 
 void GeneralTimer16Bit::register_handler_base(GeneralTimer16Bit::ISRVectors vector, GeneralTimer16Bit* handler)
