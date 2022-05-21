@@ -55,9 +55,13 @@ public:
     /// @brief enumeration of BasicTimer interrupt irq abstractions
     enum class IRQs
     {
+        /// @brief TIM1 Break interrupt
         TIM1_BRK_TIM15_IRQHandler,
+        /// @brief TIM1 update interrupt 
         TIM1_UP_TIM16_IRQHandler,
+        /// @brief TIM1 trigger and commutation interrupt 
         TIM1_TRG_COM_IRQHandler,
+        /// @brief TIM1 capture compare interrupt
         TIM1_CC_IRQHandler,
         LENGTH
     };    
