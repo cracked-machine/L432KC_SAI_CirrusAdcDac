@@ -55,7 +55,14 @@ public:
         LENGTH
     };    
 
-    GeneralTimer32Bit(Block timer_block, uint16_t psc, uint16_t arr, uint16_t cnt = 0, bool delayed_start = false);
+    /// @brief Construct a new GeneralTimer32Bit object. 
+    /// Implicit defaults are: one pulse mode disabled, all UEV source enabled, auto-reload preload enabled
+    /// @param irq The timer/IRQ to use
+    /// @param psc The prescaler value
+    /// @param arr The auto-reload value
+    /// @param cnt The initial counter value
+    /// @param delayed_start if true enable timer now, if false leave disabled. True by default
+    GeneralTimer32Bit(ISRVectors irq, uint16_t psc, uint16_t arr, uint16_t cnt, bool delayed_start);
 
     /// @brief Setup the interrupt for this timer.
     /// @param dier The interrupt to enable
@@ -63,10 +70,10 @@ public:
     /// @param handler The object to set as the target for callback to ISR() function
     /// @param prio The interrupt priority (numerically lower is higher priority)
     /// @return [[nodiscard]] True if setup was successful, false if not 
-    [[nodiscard]] bool set_interrupts(GeneralTimer32Bit::DierBits dier, 
-                        GeneralTimer32Bit::ISRVectors vector,
-                        GeneralTimer32Bit* handler,
-                        uint32_t prio);
+    [[nodiscard]] bool set_interrupts(  GeneralTimer32Bit::DierBits dier, 
+                                        GeneralTimer32Bit::ISRVectors vector,
+                                        GeneralTimer32Bit* handler,
+                                        uint32_t prio);
 
     /// @brief Array of mappings between ISRs and callback pointers when ISRs are captured
     static inline std::array<GeneralTimer32Bit*, static_cast<std::size_t>(ISRVectors::LENGTH)> m_gen_timer32_irq_mappings;
