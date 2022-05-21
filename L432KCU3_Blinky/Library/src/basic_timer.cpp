@@ -96,22 +96,41 @@ void BasicTimer::set_cnt(uint16_t cnt)
     m_timer_registers->CNT = cnt;
 }
 
-void BasicTimer::set_interrupts(BasicTimer::DierBits dier, uint32_t prio)
+bool BasicTimer::set_interrupts(BasicTimer::DierBits dier, 
+                                BasicTimer::ISRVectors vector,
+                                BasicTimer* handler, 
+                                uint32_t prio)
 {
-    // Setup the NVIC, priority and DIER register
-    switch(m_timer_block)
+    switch(dier)
     {
-        case Block::T6:
-            NVIC_SetPriority(TIM6_DAC_IRQn, prio);
-            NVIC_EnableIRQ(TIM6_DAC_IRQn);             
-            break;
+        case DierBits::UDE:
+            // if TIM6 use DMA1 Ch3 (DMA_CSELR->C3S = 0110) or DMA2 Ch4 (DMA_CSELR->C4S = 0011)
+            // if TIM7 use DMA1 Ch4 (DMA_CSELR->C4S = 0101), DMA2 Ch5 (DMA_CSELR->C5S = 0011)
+            // should not set DMA using this function
+            return false;
+        case DierBits::UIE:
+            // Set the caller as the target for callback to ISR() function
+            register_handler_base(vector, handler);
+            
+            // Setup the NVIC, priority and DIER register
+            switch(vector)
+            {
+                case ISRVectors::TIM6_DACUNDER_IRQHandler:
+                    NVIC_SetPriority(TIM6_DAC_IRQn, prio);
+                    NVIC_EnableIRQ(TIM6_DAC_IRQn);             
+                    break;
+                
+                case ISRVectors::TIM7_IRQHandler:
+                    NVIC_SetPriority(TIM7_IRQn, prio);
+                    NVIC_EnableIRQ(TIM7_IRQn);             
+                    break;
+            }    
+            m_timer_registers->DIER = static_cast<uint16_t>(dier);    
+            return true;
         
-        case Block::T7:
-            NVIC_SetPriority(TIM7_IRQn, prio);
-            NVIC_EnableIRQ(TIM7_IRQn);             
-            break;
-    }    
-    m_timer_registers->DIER = static_cast<uint16_t>(dier);
+        default:
+            return false;
+    } 
 }
 
 bool BasicTimer::is_status_set(StatusBits sr, bool auto_clear)

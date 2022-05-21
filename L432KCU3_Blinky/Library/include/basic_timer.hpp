@@ -71,10 +71,16 @@ public:
     void set_arr(uint16_t arr);
     void set_cnt(uint16_t cnt);
 
-    /// @brief Set the interrupts object
-    /// @param dier of type BasicTimer::DierBits
-    /// @param prio IRQ priority (numerically lower is higher priority)
-    void set_interrupts(BasicTimer::DierBits dier, uint32_t prio);
+    /// @brief Setup the interrupt for this timer.
+    /// @param dier The interrupt to enable
+    /// @param vector The interrupt vector to use
+    /// @param handler The object to set as the target for callback to ISR() function
+    /// @param prio The interrupt priority (numerically lower is higher priority)
+    /// @return [[nodiscard]] True if setup was successful, false if not. 
+    [[nodiscard]] bool set_interrupts(  BasicTimer::DierBits dier, 
+                                        BasicTimer::ISRVectors vector, 
+                                        BasicTimer* handler, 
+                                        uint32_t prio);
 
     /// @brief Check the "Status Register" bit. 
     /// @param sr of type BasicTimer::StatusBits
@@ -88,10 +94,6 @@ public:
     /// @brief Placeholder for the function called by the low level ISR. Should be defined by derived class.
     virtual void ISR() = 0;
 
-    /// @brief Low level function for mapping between ISRs and callback pointers.
-    /// @param vector 
-    /// @param handler 
-    void register_handler_base(BasicTimer::ISRVectors vector, BasicTimer* handler);
 protected:
 
     BasicTimer(Block timer_block);
@@ -102,6 +104,12 @@ protected:
     TIM_TypeDef* m_timer_registers;
     /// @brief Abstracted TIM peripheral, TIM1, TIM2, TIM3, etc...
     Block m_timer_block;
+
+private:
+    /// @brief Low level function for mapping between ISRs and callback pointers.
+    /// @param vector 
+    /// @param handler 
+    void register_handler_base(BasicTimer::ISRVectors vector, BasicTimer* handler);
 };
 
 extern "C" void TIM6_DACUNDER_IRQHandler(void);
