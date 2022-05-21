@@ -44,7 +44,7 @@ private:
             enable(true);
         }
     private:
-        // NVIC IRQ instance to use for this interrupt
+        /// @brief NVIC IRQ instance to use for this interrupt
         BasicTimer::ISRVectors m_irq;
         /// @brief Pointer to the parent class
         TestApp* m_handler = nullptr;
@@ -59,17 +59,16 @@ private:
     public:
         /// @brief Construct a new BlinkyTimer object
         /// @param handler Pointer to the parent class
-        BlinkyTimer2(TestApp* handler) 
-        : stm32::timer::GeneralTimer16Bit(stm32::timer::GeneralTimer16Bit::Block::T15, 16, 1024, 0, true)        
+        BlinkyTimer2(GeneralTimer16Bit::ISRVectors irq, TestApp* handler) 
+        : stm32::timer::GeneralTimer16Bit(irq, 16, 1024, 0, true), m_irq(irq), m_handler(handler)          
         {
-            using namespace stm32::timer;
-            m_handler = handler;
-            
-            [[maybe_unused]] bool result = set_interrupts(GeneralTimer16Bit::DierBits::UIE, m_isr_vector, this, 0);
+            using namespace stm32::timer;            
+            [[maybe_unused]] bool result = set_interrupts(GeneralTimer16Bit::DierBits::UIE, m_irq, this, 0);
             enable(true);
         }
     private:
-        GeneralTimer16Bit::ISRVectors m_isr_vector = GeneralTimer16Bit::ISRVectors::TIM1_BRK_TIM15_IRQHandler;
+        /// @brief NVIC IRQ instance to use for this interrupt
+        GeneralTimer16Bit::ISRVectors m_irq;
         /// @brief Pointer to the parent class
         TestApp* m_handler = nullptr;
         /// @brief Redirect the ISR() callback to parent class non-static member function 
@@ -122,9 +121,10 @@ private:
         void ISR() override { m_handler->blinky_timer_callback(); }
     };    
 
-
+    
     /// @brief led blink timer object 
-    BlinkyTimer1 m_blinky_timer{stm32::timer::BasicTimer::ISRVectors::TIM7_IRQHandler, this};
+    // BlinkyTimer1 m_blinky_timer{stm32::timer::BasicTimer::ISRVectors::TIM7_IRQHandler, this};
+    BlinkyTimer2 m_blinky_timer{stm32::timer::GeneralTimer16Bit::ISRVectors::TIM1_BRK_TIM15_IRQHandler, this};
 
 };
 

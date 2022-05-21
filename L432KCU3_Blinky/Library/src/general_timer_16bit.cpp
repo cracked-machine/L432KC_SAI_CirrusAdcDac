@@ -3,22 +3,23 @@
 namespace stm32::timer
 {
 
-GeneralTimer16Bit::GeneralTimer16Bit(GeneralTimer16Bit::Block timer_block, uint16_t psc, uint16_t arr, uint16_t cnt, bool delayed_start)
-: BasicTimer(static_cast<BasicTimer::Block>(timer_block))
+GeneralTimer16Bit::GeneralTimer16Bit(ISRVectors irq, uint16_t psc, uint16_t arr, uint16_t cnt = 0, bool delayed_start = false)
+: BasicTimer()
+{
 {
     // Each case will: 
     // 1) assign the requested TIM_TypeDef instance to the m_timer_registers member 
     // 2) Enable the requested APB1 bus clock for that timer block. Read back enforces a required short delay.
     [[maybe_unused]]  __IO uint32_t tmpreg;     
-    switch(timer_block)
+    switch(irq)
     {
-        case GeneralTimer16Bit::Block::T15:
+        case ISRVectors::TIM1_BRK_TIM15_IRQHandler:
             m_timer_registers = TIM15;
             SET_BIT(RCC->APB2ENR, RCC_APB2ENR_TIM15EN); 
             tmpreg = READ_BIT(RCC->APB2ENR, RCC_APB2ENR_TIM15EN);        
             break;
         
-        case GeneralTimer16Bit::Block::T16:
+        case ISRVectors::TIM1_UP_TIM16_IRQHandler:
             m_timer_registers = TIM16;
             SET_BIT(RCC->APB2ENR, RCC_APB2ENR_TIM16EN); 
             tmpreg = READ_BIT(RCC->APB2ENR, RCC_APB2ENR_TIM16EN);  
@@ -27,6 +28,7 @@ GeneralTimer16Bit::GeneralTimer16Bit(GeneralTimer16Bit::Block timer_block, uint1
 
     // call base member for common init
     init_cr1(psc, arr, cnt, delayed_start);
+}    
 }
 
 GeneralTimer16Bit::GeneralTimer16Bit(Block timer_block)

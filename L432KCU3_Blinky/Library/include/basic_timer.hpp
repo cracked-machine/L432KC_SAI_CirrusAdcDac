@@ -100,6 +100,7 @@ public:
 protected:
 
     BasicTimer(Block timer_block);
+    BasicTimer() = default;
 
     void init_cr1(uint16_t psc, uint16_t arr, uint16_t cnt = 0, bool delayed_start = false);
 
@@ -109,6 +110,7 @@ protected:
     Block m_timer_block;
 
 private:
+
     /// @brief Low level function for mapping between ISRs and callback pointers.
     /// @param vector 
     /// @param handler 

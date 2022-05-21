@@ -47,7 +47,14 @@ public:
         LENGTH
     };    
 
-    GeneralTimer16Bit(Block timer_block, uint16_t psc, uint16_t arr, uint16_t cnt = 0, bool delayed_start = false);
+    /// @brief Construct a new GeneralTimer16Bit object. 
+    /// Implicit defaults are: one pulse mode disabled, all UEV source enabled, auto-reload preload enabled
+    /// @param irq The timer/IRQ to use
+    /// @param psc The prescaler value
+    /// @param arr The auto-reload value
+    /// @param cnt The initial counter value
+    /// @param delayed_start if true enable timer now, if false leave disabled. True by default
+    GeneralTimer16Bit(ISRVectors irq, uint16_t psc, uint16_t arr, uint16_t cnt, bool delayed_start);
 
     /// @brief Setup the interrupt for this timer.
     /// @param dier The interrupt to enable
