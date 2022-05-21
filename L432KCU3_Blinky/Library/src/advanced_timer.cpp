@@ -23,26 +23,62 @@ AdvancedTimer::AdvancedTimer(AdvancedTimer::Block timer_block, uint16_t psc, uin
     init_cr1(psc, arr, cnt, delayed_start);
 }
 
-void AdvancedTimer::set_interrupts(AdvancedTimer::DierBits dier, uint32_t prio)
+bool AdvancedTimer::set_interrupts( AdvancedTimer::DierBits dier, 
+                                    AdvancedTimer::ISRVectors vector, 
+                                    AdvancedTimer* handler, 
+                                    uint32_t prio)
 {
-    // Setup the NVIC, priority and DIER register
-    switch(static_cast<AdvancedTimer::Block> (m_timer_block))
+    switch(dier)
     {
-        case Block::T1:
-            NVIC_SetPriority(TIM1_BRK_TIM15_IRQn, prio);
-            NVIC_EnableIRQ(TIM1_BRK_TIM15_IRQn); 
+        case DierBits::UDE:
+            // should not set DMA using this function
+            return false;
 
-            NVIC_SetPriority(TIM1_UP_TIM16_IRQn, prio);
-            NVIC_EnableIRQ(TIM1_UP_TIM16_IRQn);   
+        case DierBits::CC1IE:
+        case DierBits::CC2IE:
+        case DierBits::CC3IE:
+        case DierBits::CC4IE:
+        case DierBits::COMIE:
+        case DierBits::TIE:
+        case DierBits::BIE:
+        case DierBits::CC1DE:
+        case DierBits::CC2DE:
+        case DierBits::CC3DE:
+        case DierBits::CC4DE:
+        case DierBits::COMDE:
+        case DierBits::TDE:
+            // not implemented 
+            return false;                
+        
+        case DierBits::UIE:
+            // Set the caller "handler" as the target for callback to ISR() function
+            register_handler_base(vector, handler);          
 
-            NVIC_SetPriority(TIM1_TRG_COM_IRQn, prio);
-            NVIC_EnableIRQ(TIM1_TRG_COM_IRQn);  
+            // Setup the NVIC, priority and DIER register
+            switch(vector)
+            {
+                case ISRVectors::TIM1_BRK_TIM15_IRQHandler:
+                    NVIC_SetPriority(TIM1_BRK_TIM15_IRQn, prio);
+                    NVIC_EnableIRQ(TIM1_BRK_TIM15_IRQn); 
+                    break;
+                case ISRVectors::TIM1_UP_TIM16_IRQHandler:
+                    NVIC_SetPriority(TIM1_UP_TIM16_IRQn, prio);
+                    NVIC_EnableIRQ(TIM1_UP_TIM16_IRQn);   
+                    break;
+                case ISRVectors::TIM1_TRG_COM_IRQHandler:
+                    NVIC_SetPriority(TIM1_TRG_COM_IRQn, prio);
+                    NVIC_EnableIRQ(TIM1_TRG_COM_IRQn);  
+                    break;
+                case ISRVectors::TIM1_CC_IRQHandler:
+                    NVIC_SetPriority(TIM1_CC_IRQn, prio);
+                    NVIC_EnableIRQ(TIM1_CC_IRQn);                                                 
+                    break;
+            }    
+            m_timer_registers->DIER = static_cast<uint16_t>(dier);
 
-            NVIC_SetPriority(TIM1_CC_IRQn, prio);
-            NVIC_EnableIRQ(TIM1_CC_IRQn);                                                 
-            break;
-    }    
-    m_timer_registers->DIER = static_cast<uint16_t>(dier);
+        default:
+            return false;
+    }
 }
 
 void AdvancedTimer::register_handler_base(AdvancedTimer::ISRVectors vector, AdvancedTimer* handler)

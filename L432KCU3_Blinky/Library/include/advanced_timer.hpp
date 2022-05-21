@@ -70,13 +70,21 @@ public:
 
     AdvancedTimer(Block timer_block, uint16_t psc, uint16_t arr, uint16_t cnt = 0, bool delayed_start = false);
 
-    /// @brief Set the interrupts object
-    /// @param dier of type AdvancedTimer::DierBits
-    /// @param prio IRQ priority (numerically lower is higher priority)
-    void set_interrupts(AdvancedTimer::DierBits dier, uint32_t prio);
+    /// @brief Setup the interrupt for this timer.
+    /// @param dier The interrupt to enable
+    /// @param vector The interrupt vector to use
+    /// @param handler The object to set as the target for callback to ISR() function
+    /// @param prio The interrupt priority (numerically lower is higher priority)
+    /// @return [[nodiscard]] True if setup was successful, false if not 
+    [[nodiscard]] bool set_interrupts(AdvancedTimer::DierBits dier, 
+                        AdvancedTimer::ISRVectors vector, 
+                        AdvancedTimer* handler, 
+                        uint32_t prio);
 
     /// @brief Array of mappings between ISRs and callback pointers when ISRs are captured
     static inline std::array<AdvancedTimer*, static_cast<std::size_t>(ISRVectors::LENGTH)> m_adv_timer_irq_mappings;
+
+private:
 
     /// @brief Low level function for mapping between ISRs and callback pointers.
     /// @param vector 
