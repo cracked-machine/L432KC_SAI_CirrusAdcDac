@@ -4,7 +4,7 @@ namespace stm32::timer
 {
 
 
-GeneralTimer32Bit::GeneralTimer32Bit(ISRVectors irq, uint16_t psc, uint16_t arr, uint16_t cnt = 0, bool delayed_start = false)
+GeneralTimer32Bit::GeneralTimer32Bit(IRQs irq, uint16_t psc, uint16_t arr, uint16_t cnt = 0, bool delayed_start = false)
 : BasicTimer()
 {
     // Each case will: 
@@ -13,7 +13,7 @@ GeneralTimer32Bit::GeneralTimer32Bit(ISRVectors irq, uint16_t psc, uint16_t arr,
     [[maybe_unused]]  __IO uint32_t tmpreg;     
     switch(irq)
     {
-        case GeneralTimer32Bit::ISRVectors::TIM2_IRQHandler:
+        case GeneralTimer32Bit::IRQs::TIM2_IRQHandler:
             m_timer_registers = TIM2;
             SET_BIT(RCC->APB1ENR1, RCC_APB1ENR1_TIM2EN); 
             tmpreg = READ_BIT(RCC->APB1ENR1, RCC_APB1ENR1_TIM2EN);        
@@ -25,7 +25,7 @@ GeneralTimer32Bit::GeneralTimer32Bit(ISRVectors irq, uint16_t psc, uint16_t arr,
 }
 
 bool GeneralTimer32Bit::set_interrupts( GeneralTimer32Bit::DierBits dier, 
-                                        GeneralTimer32Bit::ISRVectors vector,
+                                        GeneralTimer32Bit::IRQs irq,
                                         GeneralTimer32Bit* handler,
                                         uint32_t prio)
 {
@@ -50,11 +50,11 @@ bool GeneralTimer32Bit::set_interrupts( GeneralTimer32Bit::DierBits dier,
         
         case DierBits::UIE:
             // Set the caller "handler" as the target for callback to ISR() function
-            register_handler_base(vector, handler);        
+            register_handler_base(irq, handler);        
             // Setup the NVIC, priority and DIER register
-            switch(vector)
+            switch(irq)
             {
-                case ISRVectors::TIM2_IRQHandler:
+                case IRQs::TIM2_IRQHandler:
                     NVIC_SetPriority(TIM2_IRQn, prio);
                     NVIC_EnableIRQ(TIM2_IRQn);             
                     break;
@@ -66,16 +66,16 @@ bool GeneralTimer32Bit::set_interrupts( GeneralTimer32Bit::DierBits dier,
     }
 }
 
-void GeneralTimer32Bit::register_handler_base(GeneralTimer32Bit::ISRVectors vector, GeneralTimer32Bit* handler)
+void GeneralTimer32Bit::register_handler_base(GeneralTimer32Bit::IRQs irq, GeneralTimer32Bit* handler)
 {
-    m_gen_timer32_irq_mappings[static_cast<std::size_t>(vector)] = handler;
+    m_gen_timer32_irq_mappings[static_cast<std::size_t>(irq)] = handler;
 }    
 
 
 extern "C" void TIM2_IRQHandler(void)
 {
     using namespace stm32::timer;
-    GeneralTimer32Bit::m_gen_timer32_irq_mappings[static_cast<std::size_t>(GeneralTimer32Bit::ISRVectors::TIM2_IRQHandler)]->ISR();
+    GeneralTimer32Bit::m_gen_timer32_irq_mappings[static_cast<std::size_t>(GeneralTimer32Bit::IRQs::TIM2_IRQHandler)]->ISR();
     TIM2->SR &= ~TIM_SR_UIF;
 }
 

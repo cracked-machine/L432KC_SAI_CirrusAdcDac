@@ -3,7 +3,7 @@
 namespace stm32::timer
 {
 
-BasicTimer::BasicTimer(ISRVectors irq, uint16_t psc, uint16_t arr, uint16_t cnt, bool delayed_start)
+BasicTimer::BasicTimer(IRQs irq, uint16_t psc, uint16_t arr, uint16_t cnt, bool delayed_start)
 {
     // Each case will: 
     // 1) assign the requested TIM_TypeDef instance to the m_timer_registers member 
@@ -11,13 +11,13 @@ BasicTimer::BasicTimer(ISRVectors irq, uint16_t psc, uint16_t arr, uint16_t cnt,
     [[maybe_unused]]  __IO uint32_t tmpreg;     
     switch(irq)
     {
-        case ISRVectors::TIM6_DACUNDER_IRQHandler:
+        case IRQs::TIM6_DACUNDER_IRQHandler:
             m_timer_registers = TIM6;
             SET_BIT(RCC->APB1ENR1, RCC_APB1ENR1_TIM6EN); 
             tmpreg = READ_BIT(RCC->APB1ENR1, RCC_APB1ENR1_TIM6EN);        
             break;
         
-        case ISRVectors::TIM7_IRQHandler:
+        case IRQs::TIM7_IRQHandler:
             m_timer_registers = TIM7;
             SET_BIT(RCC->APB1ENR1, RCC_APB1ENR1_TIM7EN); 
             tmpreg = READ_BIT(RCC->APB1ENR1, RCC_APB1ENR1_TIM7EN);  
@@ -26,10 +26,6 @@ BasicTimer::BasicTimer(ISRVectors irq, uint16_t psc, uint16_t arr, uint16_t cnt,
 
     init_cr1(psc, arr, cnt, delayed_start);
 }
-
-BasicTimer::BasicTimer(Block timer_block)
-: m_timer_block(timer_block)
-{}
 
 void BasicTimer::init_cr1(uint16_t psc, uint16_t arr, uint16_t cnt, bool delayed_start)
 {
@@ -96,7 +92,7 @@ void BasicTimer::set_cnt(uint16_t cnt)
 }
 
 bool BasicTimer::set_interrupts(BasicTimer::DierBits dier, 
-                                BasicTimer::ISRVectors vector,
+                                BasicTimer::IRQs irq,
                                 BasicTimer* handler, 
                                 uint32_t prio)
 {
@@ -109,17 +105,17 @@ bool BasicTimer::set_interrupts(BasicTimer::DierBits dier,
             return false;
         case DierBits::UIE:
             // Set the caller as the target for callback to ISR() function
-            register_handler_base(vector, handler);
+            register_handler_base(irq, handler);
             
             // Setup the NVIC, priority and DIER register
-            switch(vector)
+            switch(irq)
             {
-                case ISRVectors::TIM6_DACUNDER_IRQHandler:
+                case IRQs::TIM6_DACUNDER_IRQHandler:
                     NVIC_SetPriority(TIM6_DAC_IRQn, prio);
                     NVIC_EnableIRQ(TIM6_DAC_IRQn);             
                     break;
                 
-                case ISRVectors::TIM7_IRQHandler:
+                case IRQs::TIM7_IRQHandler:
                     NVIC_SetPriority(TIM7_IRQn, prio);
                     NVIC_EnableIRQ(TIM7_IRQn);             
                     break;
@@ -145,22 +141,22 @@ bool BasicTimer::is_status_set(StatusBits sr, bool auto_clear)
     }
 }
 
-void BasicTimer::register_handler_base(BasicTimer::ISRVectors vector, BasicTimer* handler)
+void BasicTimer::register_handler_base(BasicTimer::IRQs irq, BasicTimer* handler)
 {
-    m_basic_timer_irq_mappings[static_cast<std::size_t>(vector)] = handler;
+    m_basic_timer_irq_mappings[static_cast<std::size_t>(irq)] = handler;
 }
 
 extern "C" void TIM6_DACUNDER_IRQHandler(void)
 {
     using namespace stm32::timer;
-    BasicTimer::m_basic_timer_irq_mappings[static_cast<std::size_t>(BasicTimer::ISRVectors::TIM6_DACUNDER_IRQHandler)]->ISR();
+    BasicTimer::m_basic_timer_irq_mappings[static_cast<std::size_t>(BasicTimer::IRQs::TIM6_DACUNDER_IRQHandler)]->ISR();
     TIM6->SR &= ~TIM_SR_UIF;
 }
 
 extern "C" void TIM7_IRQHandler(void)
 {
     using namespace stm32::timer;
-    BasicTimer::m_basic_timer_irq_mappings[static_cast<std::size_t>(BasicTimer::ISRVectors::TIM7_IRQHandler)]->ISR();
+    BasicTimer::m_basic_timer_irq_mappings[static_cast<std::size_t>(BasicTimer::IRQs::TIM7_IRQHandler)]->ISR();
     TIM7->SR &= ~TIM_SR_UIF;
 }
 

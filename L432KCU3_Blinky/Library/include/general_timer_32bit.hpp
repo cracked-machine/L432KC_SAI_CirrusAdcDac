@@ -10,12 +10,6 @@ class GeneralTimer32Bit : public BasicTimer
 {
 public:
 
-    /// @brief The timer peripheral block for GeneralTimer32Bit
-    enum class Block
-    {
-        T2 = 2
-    };
-
     /// @brief Status Register bit absractions for GeneralTimer32Bit
     enum class StatusBits
     {
@@ -48,8 +42,8 @@ public:
         TDE     = TIM_DIER_TDE               
     };    
 
-    /// @brief enumeration of BasicTimer interrupt vector abstractions
-    enum class ISRVectors
+    /// @brief enumeration of BasicTimer interrupt irq abstractions
+    enum class IRQs
     {
         TIM2_IRQHandler,
         LENGTH
@@ -62,28 +56,28 @@ public:
     /// @param arr The auto-reload value
     /// @param cnt The initial counter value
     /// @param delayed_start if true enable timer now, if false leave disabled. True by default
-    GeneralTimer32Bit(ISRVectors irq, uint16_t psc, uint16_t arr, uint16_t cnt, bool delayed_start);
+    GeneralTimer32Bit(IRQs irq, uint16_t psc, uint16_t arr, uint16_t cnt, bool delayed_start);
 
     /// @brief Setup the interrupt for this timer.
     /// @param dier The interrupt to enable
-    /// @param vector The interrupt vector to use
+    /// @param irq The interrupt irq to use
     /// @param handler The object to set as the target for callback to ISR() function
     /// @param prio The interrupt priority (numerically lower is higher priority)
     /// @return [[nodiscard]] True if setup was successful, false if not 
     [[nodiscard]] bool set_interrupts(  GeneralTimer32Bit::DierBits dier, 
-                                        GeneralTimer32Bit::ISRVectors vector,
+                                        GeneralTimer32Bit::IRQs irq,
                                         GeneralTimer32Bit* handler,
                                         uint32_t prio);
 
     /// @brief Array of mappings between ISRs and callback pointers when ISRs are captured
-    static inline std::array<GeneralTimer32Bit*, static_cast<std::size_t>(ISRVectors::LENGTH)> m_gen_timer32_irq_mappings;
+    static inline std::array<GeneralTimer32Bit*, static_cast<std::size_t>(IRQs::LENGTH)> m_gen_timer32_irq_mappings;
 
 private:
 
     /// @brief Low level function for mapping between ISRs and callback pointers.
-    /// @param vector 
+    /// @param irq 
     /// @param handler 
-    void register_handler_base(GeneralTimer32Bit::ISRVectors vector, GeneralTimer32Bit* handler);
+    void register_handler_base(GeneralTimer32Bit::IRQs irq, GeneralTimer32Bit* handler);
 
 };
 

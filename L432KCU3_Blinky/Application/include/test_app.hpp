@@ -36,7 +36,7 @@ private:
     public:
         /// @brief Construct a new BlinkyTimer object
         /// @param handler Pointer to the parent class
-        BlinkyTimer1(BasicTimer::ISRVectors irq, TestApp* handler) 
+        BlinkyTimer1(BasicTimer::IRQs irq, TestApp* handler) 
         : stm32::timer::BasicTimer(irq, 1, 1, 0, true), m_irq(irq), m_handler(handler)         
         {
             using namespace stm32::timer;            
@@ -45,7 +45,7 @@ private:
         }
     private:
         /// @brief NVIC IRQ instance to use for this interrupt
-        BasicTimer::ISRVectors m_irq;
+        BasicTimer::IRQs m_irq;
         /// @brief Pointer to the parent class
         TestApp* m_handler = nullptr;
         /// @brief Redirect the ISR() callback to parent class non-static member function 
@@ -59,7 +59,7 @@ private:
     public:
         /// @brief Construct a new BlinkyTimer object
         /// @param handler Pointer to the parent class
-        BlinkyTimer2(GeneralTimer16Bit::ISRVectors irq, TestApp* handler) 
+        BlinkyTimer2(GeneralTimer16Bit::IRQs irq, TestApp* handler) 
         : stm32::timer::GeneralTimer16Bit(irq, 16, 1024, 0, true), m_irq(irq), m_handler(handler)          
         {
             using namespace stm32::timer;            
@@ -68,7 +68,7 @@ private:
         }
     private:
         /// @brief NVIC IRQ instance to use for this interrupt
-        GeneralTimer16Bit::ISRVectors m_irq;
+        GeneralTimer16Bit::IRQs m_irq;
         /// @brief Pointer to the parent class
         TestApp* m_handler = nullptr;
         /// @brief Redirect the ISR() callback to parent class non-static member function 
@@ -81,7 +81,7 @@ private:
     public:
         /// @brief Construct a new BlinkyTimer object
         /// @param handler Pointer to the parent class
-        BlinkyTimer3(GeneralTimer32Bit::ISRVectors irq, TestApp* handler) 
+        BlinkyTimer3(GeneralTimer32Bit::IRQs irq, TestApp* handler) 
         : stm32::timer::GeneralTimer32Bit(irq, 16, 1024, 0, true), m_irq(irq), m_handler(handler)       
         {
             using namespace stm32::timer;         
@@ -89,7 +89,8 @@ private:
             enable(true);
         }
     private:
-        GeneralTimer32Bit::ISRVectors m_irq = GeneralTimer32Bit::ISRVectors::TIM2_IRQHandler;
+        /// @brief NVIC IRQ instance to use for this interrupt
+        GeneralTimer32Bit::IRQs m_irq;
         /// @brief Pointer to the parent class
         TestApp* m_handler = nullptr;
         /// @brief Redirect the ISR() callback to parent class non-static member function 
@@ -102,17 +103,16 @@ private:
     public:
         /// @brief Construct a new BlinkyTimer object
         /// @param handler Pointer to the parent class
-        BlinkyTimer4(TestApp* handler) 
-        : stm32::timer::AdvancedTimer(stm32::timer::AdvancedTimer::Block::T1, 16, 1024, 0, true)        
+        BlinkyTimer4(AdvancedTimer::IRQs irq, TestApp* handler) 
+        : stm32::timer::AdvancedTimer(irq, 16, 1024, 0, true), m_irq(irq), m_handler(handler)
         {
-            using namespace stm32::timer;
-            m_handler = handler;       
-            
-            [[maybe_unused]] bool result = set_interrupts(AdvancedTimer::DierBits::UIE, m_isr_vector, this, 0);
+            using namespace stm32::timer;            
+            [[maybe_unused]] bool result = set_interrupts(AdvancedTimer::DierBits::UIE, m_irq, this, 0);
             enable(true);
         }
     private:
-        AdvancedTimer::ISRVectors m_isr_vector = AdvancedTimer::ISRVectors::TIM1_UP_TIM16_IRQHandler;
+        /// @brief NVIC IRQ instance to use for this interrupt
+        AdvancedTimer::IRQs m_irq;
         /// @brief Pointer to the parent class
         TestApp* m_handler = nullptr;
         /// @brief Redirect the ISR() callback to parent class non-static member function 
@@ -121,9 +121,10 @@ private:
 
     
     /// @brief led blink timer object 
-    // BlinkyTimer1 m_blinky_timer{stm32::timer::BasicTimer::ISRVectors::TIM7_IRQHandler, this};
-    // BlinkyTimer2 m_blinky_timer{stm32::timer::GeneralTimer16Bit::ISRVectors::TIM1_BRK_TIM15_IRQHandler, this};
-    BlinkyTimer3 m_blinky_timer{stm32::timer::GeneralTimer32Bit::ISRVectors::TIM2_IRQHandler, this};
+    BlinkyTimer1 m_blinky_timer{stm32::timer::BasicTimer::IRQs::TIM6_DACUNDER_IRQHandler, this};
+    // BlinkyTimer2 m_blinky_timer{stm32::timer::GeneralTimer16Bit::IRQs::TIM1_UP_TIM16_IRQHandler, this};
+    // BlinkyTimer3 m_blinky_timer{stm32::timer::GeneralTimer32Bit::IRQs::TIM2_IRQHandler, this};
+    // BlinkyTimer4 m_blinky_timer{stm32::timer::AdvancedTimer::IRQs::TIM1_UP_TIM16_IRQHandler, this};
 
 };
 

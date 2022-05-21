@@ -3,7 +3,7 @@
 namespace stm32::timer
 {
 
-GeneralTimer16Bit::GeneralTimer16Bit(ISRVectors irq, uint16_t psc, uint16_t arr, uint16_t cnt = 0, bool delayed_start = false)
+GeneralTimer16Bit::GeneralTimer16Bit(IRQs irq, uint16_t psc, uint16_t arr, uint16_t cnt = 0, bool delayed_start = false)
 : BasicTimer()
 {
 {
@@ -13,13 +13,13 @@ GeneralTimer16Bit::GeneralTimer16Bit(ISRVectors irq, uint16_t psc, uint16_t arr,
     [[maybe_unused]]  __IO uint32_t tmpreg;     
     switch(irq)
     {
-        case ISRVectors::TIM1_BRK_TIM15_IRQHandler:
+        case IRQs::TIM1_BRK_TIM15_IRQHandler:
             m_timer_registers = TIM15;
             SET_BIT(RCC->APB2ENR, RCC_APB2ENR_TIM15EN); 
             tmpreg = READ_BIT(RCC->APB2ENR, RCC_APB2ENR_TIM15EN);        
             break;
         
-        case ISRVectors::TIM1_UP_TIM16_IRQHandler:
+        case IRQs::TIM1_UP_TIM16_IRQHandler:
             m_timer_registers = TIM16;
             SET_BIT(RCC->APB2ENR, RCC_APB2ENR_TIM16EN); 
             tmpreg = READ_BIT(RCC->APB2ENR, RCC_APB2ENR_TIM16EN);  
@@ -31,12 +31,9 @@ GeneralTimer16Bit::GeneralTimer16Bit(ISRVectors irq, uint16_t psc, uint16_t arr,
 }    
 }
 
-GeneralTimer16Bit::GeneralTimer16Bit(Block timer_block)
-: BasicTimer(static_cast<BasicTimer::Block>(timer_block))
-{}
 
 bool GeneralTimer16Bit::set_interrupts( GeneralTimer16Bit::DierBits dier,
-                                        GeneralTimer16Bit::ISRVectors vector, 
+                                        GeneralTimer16Bit::IRQs irq, 
                                         GeneralTimer16Bit* handler, 
                                         uint32_t prio)
 {
@@ -56,17 +53,17 @@ bool GeneralTimer16Bit::set_interrupts( GeneralTimer16Bit::DierBits dier,
 
         case DierBits::UIE:
             // Set the caller as the target for callback to ISR() function
-            register_handler_base(vector, handler);
+            register_handler_base(irq, handler);
         
             // Setup the NVIC, priority and DIER register
-            switch(vector)
+            switch(irq)
             {
-                case ISRVectors::TIM1_BRK_TIM15_IRQHandler:
+                case IRQs::TIM1_BRK_TIM15_IRQHandler:
                     NVIC_SetPriority(TIM1_BRK_TIM15_IRQn, prio);
                     NVIC_EnableIRQ(TIM1_BRK_TIM15_IRQn);             
                     break;
                 
-                case ISRVectors::TIM1_UP_TIM16_IRQHandler:
+                case IRQs::TIM1_UP_TIM16_IRQHandler:
                     NVIC_SetPriority(TIM1_UP_TIM16_IRQn, prio);
                     NVIC_EnableIRQ(TIM1_UP_TIM16_IRQn);             
                     break;
@@ -80,23 +77,23 @@ bool GeneralTimer16Bit::set_interrupts( GeneralTimer16Bit::DierBits dier,
 
 }
 
-void GeneralTimer16Bit::register_handler_base(GeneralTimer16Bit::ISRVectors vector, GeneralTimer16Bit* handler)
+void GeneralTimer16Bit::register_handler_base(GeneralTimer16Bit::IRQs irq, GeneralTimer16Bit* handler)
 {
-    m_gen_timer16_irq_mappings[static_cast<std::size_t>(vector)] = handler;
+    m_gen_timer16_irq_mappings[static_cast<std::size_t>(irq)] = handler;
 }    
 
 
 extern "C" void TIM1_BRK_TIM15_IRQHandler(void)
 {
     using namespace stm32::timer;
-    GeneralTimer16Bit::m_gen_timer16_irq_mappings[static_cast<std::size_t>(GeneralTimer16Bit::ISRVectors::TIM1_BRK_TIM15_IRQHandler)]->ISR();
+    GeneralTimer16Bit::m_gen_timer16_irq_mappings[static_cast<std::size_t>(GeneralTimer16Bit::IRQs::TIM1_BRK_TIM15_IRQHandler)]->ISR();
     TIM15->SR &= ~TIM_SR_UIF;
 }
 
 extern "C" void TIM1_UP_TIM16_IRQHandler(void)
 {
     using namespace stm32::timer;
-    GeneralTimer16Bit::m_gen_timer16_irq_mappings[static_cast<std::size_t>(GeneralTimer16Bit::ISRVectors::TIM1_UP_TIM16_IRQHandler)]->ISR();
+    GeneralTimer16Bit::m_gen_timer16_irq_mappings[static_cast<std::size_t>(GeneralTimer16Bit::IRQs::TIM1_UP_TIM16_IRQHandler)]->ISR();
     TIM16->SR &= ~TIM_SR_UIF;
 }
 

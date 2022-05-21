@@ -84,6 +84,8 @@ public:
             Speed speed,
             Pupd pupd);        
 
+    ///// Configuration Functions
+
     /// @brief Set the mode
     /// @param mode The gpio mode (output, input, analog, alternate function)
     void set_mode(Mode mode);
@@ -99,6 +101,8 @@ public:
     /// @brief Set the pupd
     /// @param pupd The gpio pullup/pulldown setting
     void set_pupd(Pupd pupd);
+
+    ///// Usage Functions
 
     /// @brief Toggle the pin value
     void toggle();

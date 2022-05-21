@@ -10,12 +10,6 @@ class GeneralTimer16Bit : public BasicTimer
 {
 public:
 
-    /// @brief The timer peripheral block for GeneralTimer16Bit
-    enum class Block
-    {
-        T15 = 15,
-        T16 = 16
-    };
 
     /// @brief Status Register bit absractions for GeneralTimer16Bit
     enum class StatusBits
@@ -39,8 +33,8 @@ public:
         COMDE   = TIM_DIER_COMDE        
     };    
 
-    /// @brief enumeration of BasicTimer interrupt vector abstractions
-    enum class ISRVectors
+    /// @brief enumeration of BasicTimer interrupt irq abstractions
+    enum class IRQs
     {
         TIM1_BRK_TIM15_IRQHandler,
         TIM1_UP_TIM16_IRQHandler,
@@ -54,31 +48,30 @@ public:
     /// @param arr The auto-reload value
     /// @param cnt The initial counter value
     /// @param delayed_start if true enable timer now, if false leave disabled. True by default
-    GeneralTimer16Bit(ISRVectors irq, uint16_t psc, uint16_t arr, uint16_t cnt, bool delayed_start);
+    GeneralTimer16Bit(IRQs irq, uint16_t psc, uint16_t arr, uint16_t cnt, bool delayed_start);
 
     /// @brief Setup the interrupt for this timer.
     /// @param dier The interrupt to enable
-    /// @param vector The interrupt vector to use
+    /// @param irq The interrupt irq to use
     /// @param handler The object to set as the target for callback to ISR() function
     /// @param prio The interrupt priority (numerically lower is higher priority)
     /// @return [[nodiscard]] True if setup was successful, false if not 
     [[nodiscard]] bool set_interrupts(GeneralTimer16Bit::DierBits dier,
-                        GeneralTimer16Bit::ISRVectors vector, 
+                        GeneralTimer16Bit::IRQs irq, 
                         GeneralTimer16Bit* handler, 
                         uint32_t prio);
 
     /// @brief Array of mappings between ISRs and callback pointers when ISRs are captured
-    static inline std::array<GeneralTimer16Bit*, static_cast<std::size_t>(ISRVectors::LENGTH)> m_gen_timer16_irq_mappings;
+    static inline std::array<GeneralTimer16Bit*, static_cast<std::size_t>(IRQs::LENGTH)> m_gen_timer16_irq_mappings;
 
 
 protected:
-    GeneralTimer16Bit(Block timer_block);
-
+    GeneralTimer16Bit() = default;
 private:
     /// @brief Low level function for mapping between ISRs and callback pointers.
-    /// @param vector 
+    /// @param irq 
     /// @param handler 
-    void register_handler_base(GeneralTimer16Bit::ISRVectors vector, GeneralTimer16Bit* handler);
+    void register_handler_base(GeneralTimer16Bit::IRQs irq, GeneralTimer16Bit* handler);
 };
 
 extern "C" void TIM1_BRK_TIM15_IRQHandler(void);

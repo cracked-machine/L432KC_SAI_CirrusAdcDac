@@ -12,13 +12,6 @@ namespace stm32::timer
 class BasicTimer
 {
 public:
-
-    /// @brief The timer peripheral block for BasicTimer
-    enum class Block
-    {
-        T6 = 6,
-        T7 = 7
-    };
   
     /// @brief Status Register bit absractions for BasicTimer
     enum class StatusBits
@@ -33,8 +26,8 @@ public:
         UIE = TIM_DIER_UIE
     };
 
-    /// @brief enumeration of BasicTimer interrupt vector abstractions
-    enum class ISRVectors
+    /// @brief enumeration of BasicTimer interrupt irq abstractions
+    enum class IRQs
     {
         TIM6_DACUNDER_IRQHandler,
         TIM7_IRQHandler,
@@ -48,7 +41,7 @@ public:
     /// @param arr The auto-reload value
     /// @param cnt The initial counter value
     /// @param delayed_start if true enable timer now, if false leave disabled. True by default
-    BasicTimer(ISRVectors irq, uint16_t psc, uint16_t arr, uint16_t cnt, bool delayed_start);
+    BasicTimer(IRQs irq, uint16_t psc, uint16_t arr, uint16_t cnt, bool delayed_start);
     
     void enable(bool enable_timer);
 
@@ -76,12 +69,12 @@ public:
 
     /// @brief Setup the interrupt for this timer.
     /// @param dier The interrupt to enable
-    /// @param vector The interrupt vector to use
+    /// @param irq The interrupt irq to use
     /// @param handler The object to set as the target for callback to ISR() function
     /// @param prio The interrupt priority (numerically lower is higher priority)
     /// @return [[nodiscard]] True if setup was successful, false if not. 
     [[nodiscard]] bool set_interrupts(  BasicTimer::DierBits dier, 
-                                        BasicTimer::ISRVectors vector, 
+                                        BasicTimer::IRQs irq, 
                                         BasicTimer* handler, 
                                         uint32_t prio);
 
@@ -92,29 +85,27 @@ public:
     bool is_status_set(BasicTimer::StatusBits sr, bool auto_clear = true);
 
     /// @brief Array of mappings between ISRs and callback pointers when ISRs are captured
-    static inline std::array<BasicTimer*, static_cast<std::size_t>(ISRVectors::LENGTH)> m_basic_timer_irq_mappings;
+    static inline std::array<BasicTimer*, static_cast<std::size_t>(IRQs::LENGTH)> m_basic_timer_irq_mappings;
 
     /// @brief Placeholder for the function called by the low level ISR. Should be defined by derived class.
     virtual void ISR() = 0;
 
 protected:
 
-    BasicTimer(Block timer_block);
     BasicTimer() = default;
 
     void init_cr1(uint16_t psc, uint16_t arr, uint16_t cnt = 0, bool delayed_start = false);
 
     /// @brief Structure holding the timer peripheral registers
     TIM_TypeDef* m_timer_registers;
-    /// @brief Abstracted TIM peripheral, TIM1, TIM2, TIM3, etc...
-    Block m_timer_block;
+
 
 private:
 
     /// @brief Low level function for mapping between ISRs and callback pointers.
-    /// @param vector 
+    /// @param irq 
     /// @param handler 
-    void register_handler_base(BasicTimer::ISRVectors vector, BasicTimer* handler);
+    void register_handler_base(BasicTimer::IRQs irq, BasicTimer* handler);
 };
 
 extern "C" void TIM6_DACUNDER_IRQHandler(void);
