@@ -4,7 +4,7 @@
 
 TestApp::TestApp()
 {
-        
+
 }
 
 void TestApp::run()
